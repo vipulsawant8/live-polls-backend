@@ -8,6 +8,12 @@ import { randomUUID } from "crypto";
 
 const createPoll = asyncHandler( async (req, res) => {
 
+	if (process.env.NODE_ENV === "development") {
+		
+		console.log("createPoll controller");
+		console.log("req.body :", req.body);
+	}
+
 	const userID = req.user._id;
 
 	const { title, options } = req.body;
@@ -30,6 +36,12 @@ const fetchPolls = asyncHandler( async (req, res) => {
 } );
 
 const getPollByID = asyncHandler( async (req, res) => {
+
+	if (process.env.NODE_ENV === "development") {
+		
+		console.log("getPollByID controller");
+		console.log("req.params :", req.params);
+	}
 	
 	const pollID = req.params.id;
 
@@ -41,6 +53,11 @@ const getPollByID = asyncHandler( async (req, res) => {
 } );
 
 const closePoll = asyncHandler( async (req, res) => {
+	if (process.env.NODE_ENV === "development") {
+		
+		console.log("closePoll controller");
+		console.log("req.params :", req.params);
+	}
 
 	const userID = req.user._id;
 	const pollID = req.params.id;

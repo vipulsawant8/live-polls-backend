@@ -19,14 +19,16 @@ const generateAccessRefreshToken = async (id) => {
 
 
 	const tokens = { accessToken, refreshToken };
-	// console.log('refreshToken from tokens:', tokens.refreshToken, "refreshToken from user :", user.refreshToken);
 	return tokens;
 };
 
 const registerUser = asyncHandler( async (req, res) => {
 
-	// console.log("registerUser Handler");
-	// console.log("req.body :", req.body);
+	if (process.env.NODE_ENV === "development") {
+
+		console.log("registerUser Handler");
+		console.log("req.body :", req.body);
+	}
 
 	const email = req.body.email;
 	const name = req.body.name;
@@ -47,8 +49,11 @@ const registerUser = asyncHandler( async (req, res) => {
 
 const loginUser = asyncHandler( async (req, res) => {
 
-	// console.log("loginUser controller");
-	// console.log("req.body :", req.body);
+	if (process.env.NODE_ENV === "development") {
+
+		console.log("loginUser controller");
+		console.log("req.body :", req.body);
+	}
 
 	const identity = req.body.identity;
 	const password = req.body.password;
@@ -69,7 +74,7 @@ const loginUser = asyncHandler( async (req, res) => {
 	
 	const responseUser = validUser.toJSON();
 
-	const response = { message: "User logged-in successfully", data: { user: responseUser, accessToken }, success: true };
+	const response = { message: "User logged-in successfully", data: responseUser, success: true };
 
 	return res.status(200)
 	.cookie('accessToken', accessToken, setCookieOptions('accessToken'))
@@ -102,28 +107,29 @@ const getMe = asyncHandler( async (req, res) => {
 
 const refreshAccessToken = asyncHandler( async (req, res) => {
 
-	// console.log("refresh controller");
-	// console.log("req.body :", req.body);
+	if (process.env.NODE_ENV === "development") {
+		
+		console.log("refresh controller");
+		console.log("req.body :", req.body);
+	}
 
 	const incomingToken = req.cookies.refreshToken;
-	// console.log('incomingToken :', incomingToken);
-	if (!incomingToken)  throw new ApiError(400, ERRORS.TOKEN_MISSING);
+	if (!incomingToken)  throw new ApiError(401, "Unauthorized");
 	
 	const decodedToken = jwt.verify(incomingToken, process.env.REFRESH_TOKEN_SECRET);
 
 	const validUser = await User.findById(decodedToken.id);
-	// console.log('validUser :', validUser);
+	
+	if (process.env.NODE_ENV === "development") console.log('validUser :', validUser);
 
-	if (!validUser || !validUser.refreshToken) throw new ApiError(401, ERRORS.USER_NOT_FOUND);
+	if (!validUser || !validUser.refreshToken) throw new ApiError(401, "Unauthorized");
 
-	if (incomingToken !== validUser.refreshToken) throw new ApiError(401, ERRORS.TOKEN_INVALID);
+	if (incomingToken !== validUser.refreshToken) throw new ApiError(401, "Unauthorized");
 	const { accessToken, refreshToken } = await generateAccessRefreshToken(validUser._id);
-
-	// console.log("user :", validUser);
 
 	const validUserJSON = validUser.toJSON();
 
-	const response = { message: "User logged-in successfully", data: { user: validUserJSON, accessToken }, success: true };
+	const response = { message: "User logged-in successfully", data: validUserJSON, success: true };
 
 	return res.status(200)
 	.cookie('accessToken', accessToken, setCookieOptions('accessToken'))

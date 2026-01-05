@@ -13,7 +13,7 @@ const verifyLogin = asyncHandler( async (req, res, next) => {
 	} else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
 
 		accessToken = req.headers.authorization.split(" ")[1];
-	} else throw new ApiError(401, "Un-authorized");
+	} else throw new ApiError(401, "Unauthorized");
 
 	let decodedToken;
 	try {
@@ -21,10 +21,10 @@ const verifyLogin = asyncHandler( async (req, res, next) => {
 		decodedToken = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
 	} catch (error) {
 		
-		throw new ApiError(401, "Token Invalid or Expired")
+		throw new ApiError(401, "Unauthorized")
 	}
 
-	if (!decodedToken.id) throw new ApiError(401, "Token Invalid");
+	if (!decodedToken.id) throw new ApiError(401, "Unauthorized");
 
 	const user = await User.findById(decodedToken.id).select("-password -refreshToken");
 
