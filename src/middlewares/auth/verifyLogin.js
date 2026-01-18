@@ -5,15 +5,9 @@ import User from "../../models/user.model.js";
 
 const verifyLogin = asyncHandler( async (req, res, next) => {
 	
-	let accessToken;
+	const accessToken = req.cookies?.accessToken;
 
-	if (req.cookies?.accessToken) {
-		
-		accessToken = req.cookies.accessToken;
-	} else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-
-		accessToken = req.headers.authorization.split(" ")[1];
-	} else throw new ApiError(401, "Unauthorized");
+	if (!accessToken) throw new ApiError(401, "Unauthorized");
 
 	let decodedToken;
 	try {

@@ -32,9 +32,9 @@ const errorHandler = (err, req, res, next) => {
 		let message;
 		if (collection === "polls") {
 			message = ERRORS.POLL_ALREADY_EXISTS;
+		} else{
+			message = `${fields} already exists in ${collection}`;
 		}
-
-		message = `${fields} already exists in ${collection}`;
 
 		return res.status(400).json({
 			success: false,

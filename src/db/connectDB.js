@@ -1,7 +1,7 @@
 import { connect } from "mongoose";
-// import User from "../models/user.model.js";
-// import Poll from "../models/poll.model.js";
-// import Vote from "../models/vote.model.js";
+import User from "../models/user.model.js";
+import Poll from "../models/poll.model.js";
+import Vote from "../models/vote.model.js";
 
 const connectDB = async () => {
 
@@ -23,9 +23,9 @@ const connectDB = async () => {
 			console.log("MongoDB connection collections :", Object.keys(conn.connection.collections));
 		}
 
-		// await Vote.syncIndexes();
-		// await Poll.syncIndexes();
-		// await User.syncIndexes();
+		await Vote.syncIndexes();
+		await Poll.syncIndexes();
+		await User.syncIndexes();
 	} catch (error) {
 		
 		console.log("Mongo Connection Error :", error);

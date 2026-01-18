@@ -23,11 +23,29 @@ const userSchema = new Schema({
 		require: true,
 		trim: true
 	},
-	refreshToken : {
-
-		type: String,
-		default: ""
-	}
+	refreshTokens : 
+		[
+			{
+				token: {
+					type: String,
+					require: true,
+				},
+				deviceId: {
+					type: String,
+					require: true,
+				},
+				userAgent: {
+					type: String
+				},
+				ipAddress: {
+					type: String
+				},
+				createdAt: {
+					type: Date,
+					default: Date.now,
+				}
+			}
+		]
 }, { timestamps: true });
 
 userSchema.index({ email: 1 }, { unique:true })
@@ -43,7 +61,7 @@ userSchema.pre('save', async function () {
 userSchema.methods.toJSON = function () {
 
 	const user = this.toObject();
-	delete user.refreshToken;
+	delete user.refreshTokens;
 	delete user.password;
 	return user;
 };

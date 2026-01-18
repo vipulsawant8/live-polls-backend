@@ -12,6 +12,7 @@ import errorHandler from './middlewares/error/errorHandler.middleware.js';
 const app = e();
 
 app.disable('x-powered-by');
+app.set('trust proxy', true);
 
 // console.log('origins :', process.env);
 

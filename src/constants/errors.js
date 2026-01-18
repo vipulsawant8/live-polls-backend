@@ -9,7 +9,7 @@ const ERRORS = {
 
 	// USER
 	USER_NOT_FOUND: "User not found",
-	EMAIL_ALREADY_EXISTS: "Email is already registered",
+	EMAIL_ALREADY_EXISTS: "An account with this email already exists. Try logging in",
 
 	// POLL
 	POLL_NOT_FOUND: "Poll not found",

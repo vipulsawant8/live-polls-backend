@@ -10,6 +10,6 @@ router.post('/login', loginUser);
 router.post('/logout', verifyLogin, logoutUser);
 
 router.get('/me', verifyLogin, getMe);
-router.get('/refresh-token', refreshAccessToken);
+router.post('/refresh-token', refreshAccessToken);
 
 export default router;
