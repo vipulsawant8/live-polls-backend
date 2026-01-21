@@ -17,17 +17,17 @@ const joinPollHandler = async(io, socket, { pollID }) => {
 		}
 	} catch (error) {
 		
-		console.log("error :", error);
+		if (process.env.NODE_ENV !== "production") console.log("error :", error);
 	}
 };
 
 const castVoteHandler = async(io, socket, { pollID, optionID, optionDocID }) => {
 
-	// console.log("castVoteHandler :", pollID, optionID, optionDocID);
+	if (process.env.NODE_ENV !== "production") console.log("castVoteHandler :", pollID, optionID, optionDocID);
 
 	const userID = socket.userID;
 
-	// console.log(userID);
+	if (process.env.NODE_ENV !== "production") console.log(userID);
 
 	const room = `poll:${pollID}`;
 
@@ -52,9 +52,8 @@ const castVoteHandler = async(io, socket, { pollID, optionID, optionDocID }) => 
 	if (duplicate) {
 		return socket.emit('vote-rejected', { message: "Vote already casted" });
 	}
-		// console.log("is document:", poll instanceof Document);
-		// console.log("options constructor:", poll.options.constructor.name);
-
+	if (process.env.NODE_ENV !== "production") console.log("is document:", poll instanceof Document);
+	if (process.env.NODE_ENV !== "production") console.log("options constructor:", poll.options.constructor.name);
 
 	const option = poll.options.id(optionDocID);
 

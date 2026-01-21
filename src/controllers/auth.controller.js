@@ -75,8 +75,6 @@ const loginUser = asyncHandler( async (req, res) => {
 
 	if (process.env.NODE_ENV === "development") console.log('validUser :', validUser);
 
-	// console.log('validUser :', validUser);
-
 	const isPasswordVerified = await validUser.verifyPassword(password);
 
 	if (!isPasswordVerified) throw new ApiError(401, ERRORS.INVALID_CREDENTIALS);
@@ -158,10 +156,7 @@ const refreshAccessToken = asyncHandler( async (req, res) => {
 	
 	if (process.env.NODE_ENV === "development") console.log('validUser :', validUser);
 
-	// if (!validUser || !validUser.refreshToken) throw new ApiError(401, "Unauthorized");
-
-	// if (incomingToken !== validUser.refreshToken) throw new ApiError(401, "Unauthorized");
-	// const { accessToken, refreshToken } = await generateAccessRefreshToken(validUser._id);
+	if (!validUser) throw new ApiError(404, "Unauthorized");
 
 	const tokenIndex = validUser.refreshTokens.findIndex( (tokenObj) => tokenObj.token === incomingToken && tokenObj.deviceId === deviceId );
 

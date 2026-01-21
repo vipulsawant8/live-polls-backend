@@ -13,7 +13,6 @@ const initiateServer = async () => {
 	try {
 		
 		console.log("Server Initiated");
-		console.log("process.env.NODE_ENV :", process.env.NODE_ENV);
 		
 		const server = http.createServer(app);
 		const io = new Server(server, {
@@ -35,7 +34,8 @@ const initiateServer = async () => {
 	} catch (error) {
 		
 		console.error(error.message);
-		console.log("Error :", error);	
+		console.log("Error :", error);
+		process.exit(1);
 	}
 };
 

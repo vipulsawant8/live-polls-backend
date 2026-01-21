@@ -14,10 +14,8 @@ const app = e();
 app.disable('x-powered-by');
 app.set('trust proxy', true);
 
-// console.log('origins :', process.env);
-
 const allowedOrigins = process.env.CORS_ORIGIN.split(',');
-console.log("Allowed CORS Origins :", allowedOrigins);
+if (process.env.NODE_ENV !== "production") console.log("Allowed CORS Origins :", allowedOrigins);
 
 const corsOptions = {
 	origin: function (origin, callback) {

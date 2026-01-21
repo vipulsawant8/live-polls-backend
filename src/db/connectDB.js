@@ -11,12 +11,9 @@ const connectDB = async () => {
 
 		if (!DB_PATH) {
 			throw new Error("DB_CONNECT_STRING is not defined in environment variables");
-			process.exit(1);
 		}
 
 		const conn = await connect(DB_PATH);
-	
-		// console.log('MongoDB connected :', conn.connection.host);
 
 		if (process.env.NODE_ENV !== "production") {
 			console.log("MongoDB connection name :", conn.connection.name);

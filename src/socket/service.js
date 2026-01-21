@@ -8,12 +8,12 @@ const socketHandler = (io) => {
 	io.use((socket, next) => {
 
 		const cookieHeader =  socket.handshake.headers.cookie || "";
-		console.log("cookieHeader :", cookieHeader);
+		if (process.env.NODE_ENV !== "production") console.log("cookieHeader :", cookieHeader);
 
 		const cookies = parseCookie(cookieHeader);
 		const accessToken = cookies.accessToken;
 		
-		console.log("accessToken :", accessToken);
+		if (process.env.NODE_ENV !== "production") console.log("accessToken :", accessToken);
 
 		if (!accessToken) {
 			socket.userID = null;
@@ -23,7 +23,7 @@ const socketHandler = (io) => {
 		try {
 			
 			const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
-			console.log("decoded :", decoded);
+			if (process.env.NODE_ENV !== "production") console.log("decoded :", decoded);
 			socket.userID = decoded.id;
 		} catch (error) {
 			
