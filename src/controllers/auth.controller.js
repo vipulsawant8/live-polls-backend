@@ -2,7 +2,8 @@ import asyncHandler from "express-async-handler";
 import User from "../models/user.model.js";
 import ApiError from "../utils/ApiError.js";
 
-import setCookieOptions from "../constants/setCookieOptions.js";
+import { setCookieOptions, clearCookieOptions } from "../constants/cookieOptions.js";
+
 import ERRORS from "../constants/errors.js";
 
 import jwt from 'jsonwebtoken';
@@ -105,10 +106,10 @@ const logoutUser = asyncHandler( async (req, res) => {
 		decodedToken = jwt.verify(incomingToken, process.env.REFRESH_TOKEN_SECRET);
 	} catch (error) {
 		
-		return res.clearCookie('accessToken')
-		.clearCookie('refreshToken')
-		.status(200)
-		.json({ message: "Logged out successfully.", success: true });
+		return res.status(401)
+		.clearCookie('accessToken', clearCookieOptions('accessToken'))
+		.clearCookie('refreshToken', clearCookieOptions('refreshToken'))
+		.json({ message: "Unauthorized.", success: false });
 	}
 	
 	// await User.findByIdAndUpdate(user._id, { $set: { refreshToken: null } });
@@ -121,8 +122,8 @@ const logoutUser = asyncHandler( async (req, res) => {
 
 	const response = { message: "Logged out successfully.", success: true };
 	return res.status(200)
-	.clearCookie('accessToken')
-	.clearCookie('refreshToken')
+	.clearCookie('accessToken', clearCookieOptions('accessToken'))
+	.clearCookie('refreshToken', clearCookieOptions('refreshToken'))
 	.json(response);
 } );
 

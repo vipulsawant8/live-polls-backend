@@ -83,7 +83,7 @@ src
 ├── app.js
 ├── constants
 │   ├── errors.js
-│   └── setCookieOptions.js
+│   └── cookieOptions.js
 ├── controllers
 │   ├── auth.controller.js
 │   └── poll.controller.js
