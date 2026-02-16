@@ -22,58 +22,49 @@ const joinPollHandler = async(io, socket, { pollID }) => {
 };
 
 const castVoteHandler = async(io, socket, { pollID, optionID, optionDocID }) => {
-
-	if (process.env.NODE_ENV !== "production") console.log("castVoteHandler :", pollID, optionID, optionDocID);
-
+	try{
 	const userID = socket.userID;
+    const room = `poll:${pollID}`;
 
-	if (process.env.NODE_ENV !== "production") console.log(userID);
+    if (!userID) {
+      return socket.emit("vote-rejected", { message: "Login required" });
+    }
 
-	const room = `poll:${pollID}`;
+    // 1️⃣ Ensure poll exists and is open
+    const poll = await Poll.findOne({ _id: pollID, open: true }).lean();
+    if (!poll) {
+      return socket.emit("vote-rejected", { message: "Poll not found or closed" });
+    }
 
-	if (!userID) {
-		
-		return socket.emit('vote-rejected', { message: "Login required" });
-	}
+    // 2️⃣ Create vote (DB-level duplicate protection)
+    await Vote.create({ pollID, userID, optionID });
 
-	const poll = await Poll.findById(pollID);
+    // 3️⃣ Atomic increment of selected option
+    const updateResult = await Poll.updateOne(
+      { _id: pollID, open: true, "options._id": optionDocID },
+      { $inc: { "options.$.votes": 1 } }
+    );
 
-	if (!poll) {
-		
-		return socket.emit('vote-rejected', { message: "Poll not found" });
-	}
+    if (updateResult.modifiedCount === 0) {
+      return socket.emit("vote-rejected", { message: "Option not found" });
+    }
 
-	if (!poll.open) {
-		return socket.emit('vote-rejected', { message: "Poll is closed" });
-	}
+    // 4️⃣ Fetch updated poll
+    const updatedPoll = await Poll.findById(pollID).lean();
 
-	const duplicate = await Vote.findOne({ userID, pollID }).lean();
-	
-	if (duplicate) {
-		return socket.emit('vote-rejected', { message: "Vote already casted" });
-	}
-	if (process.env.NODE_ENV !== "production") console.log("is document:", poll instanceof Document);
-	if (process.env.NODE_ENV !== "production") console.log("options constructor:", poll.options.constructor.name);
+    // 5️⃣ Broadcast to room
+    io.to(room).emit("poll-data", { poll: updatedPoll });
 
-	const option = poll.options.id(optionDocID);
+    socket.emit("vote-accepted", { message: "Vote counted" });
 
-	if (!option) {
-		return socket.emit('vote-rejected', { message: "Option not found" });
-	}
+  } catch (err) {
+    if (err.code === 11000) {
+      return socket.emit("vote-rejected", { message: "Vote already casted" });
+    }
 
-	await Vote.create({
-		pollID,
-		userID,
-		optionID
-	});
-
-	option.votes += 1;
-	await poll.save();
-
-	const updated = await Poll.findById(pollID).lean();
-	io.to(room).emit('poll-data', { poll: updated });
-
-	socket.emit('vote-accepted', { message: "Vote counted" });
+    console.error("Vote error:", err);
+    socket.emit("vote-rejected", { message: "Internal server error" });
+  }
 };
 
 export { castVoteHandler, joinPollHandler };

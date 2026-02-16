@@ -10,3 +10,5 @@ node_modules/
 
 db_users_data.json
 users.json
+socket-test.yml
+report.json

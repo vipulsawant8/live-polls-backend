@@ -14,6 +14,7 @@ const ERRORS = {
 	// POLL
 	POLL_NOT_FOUND: "Poll not found",
 	POLL_DATA_REQUIRED: "Poll title and atleast 2 options are required",
+	POLL_OPTIONS_LENGTH_MAX: "Options per poll should not be more than 6 ",
 	POLL_ALREADY_EXISTS: "Poll with this title already exists",
 	POLL_CLOSED: "Poll is closed for voting",
 	OPTION_NOT_FOUND: "Poll option not found",

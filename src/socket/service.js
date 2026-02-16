@@ -15,6 +15,7 @@ const socketHandler = (io) => {
 		
 		if (process.env.NODE_ENV !== "production") console.log("accessToken :", accessToken);
 
+		// const accessToken = socket.handshake.auth?.token;
 		if (!accessToken) {
 			socket.userID = null;
 			return next();
@@ -28,13 +29,14 @@ const socketHandler = (io) => {
 		} catch (error) {
 			
 			socket.userID = null;
+			if (process.env.NODE_ENV !== "production") console.log("error :", error);
 		}
 
 		next();
 	});
 
 	io.on('connection', (socket) => {
-
+		console.log("Connected:", socket.id);
 		pollReceiver(io, socket);
 	});
 };

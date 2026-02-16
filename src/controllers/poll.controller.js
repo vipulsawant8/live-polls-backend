@@ -19,6 +19,7 @@ const createPoll = asyncHandler( async (req, res) => {
 	const { title, options } = req.body;
 
 	if (!title || !options || !Array.isArray(options) || options.length < 2)  throw new ApiError(400, ERRORS.POLL_DATA_REQUIRED);
+	if (options.length > 6) throw new ApiError(400, ERRORS.POLL_OPTIONS_LENGTH_MAX);
 
 	const formatedOpts = options.map(text => ({ text, vote: 0, optionID: randomUUID() }));
 
@@ -30,7 +31,7 @@ const createPoll = asyncHandler( async (req, res) => {
 
 const fetchPolls = asyncHandler( async (req, res) => {
 
-	const polls = await Poll.find().sort({ createdAt: -1 }).lean();
+	const polls = await Poll.find().sort({ createdAt: -1 }).populate('userID', "name").lean();
 	const response = { success: true, data: polls, message: "Polls fetched successfully" };
 	return res.status(200).json(response);
 } );
