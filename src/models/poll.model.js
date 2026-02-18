@@ -3,11 +3,11 @@ import { Schema, Types, model } from "mongoose";
 const optionsSchema = new Schema({
 	optionID: {
 		type: String,
-		require: true
+		required: true
 	},
 	text: {
 		type: String,
-		require: true
+		required: true
 	},
 	votes: {
 		type: Number,
@@ -21,12 +21,12 @@ const pollSchema = new Schema({
 		
 		type: Types.ObjectId,
 		ref: "User",
-		require: true
+		required: true
 	},
 	title:{
 		
 		type: String,
-		require: true,
+		required: true,
 		trim: true
 	},
 	options: {
@@ -36,10 +36,14 @@ const pollSchema = new Schema({
 	open: {
 		type: Boolean,
 		default: true
+	},
+	expiresAt: {
+		type: Date,
+		required: true
 	}
 }, { timestamps: true });
 
-pollSchema.index({ title: 1 }, { unique: true, collation: { locale: 'en', strength: 2 } });
+pollSchema.index({ userID: 1, title: 1 }, { unique: true, collation: { locale: 'en', strength: 2 } });
 
 pollSchema.methods.toJSON = function () {
 

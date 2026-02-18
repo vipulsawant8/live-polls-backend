@@ -6,6 +6,8 @@ import ERRORS from '../constants/errors.js';
 
 import { randomUUID } from "crypto";
 
+const POLL_EXPIRY_WINDOW = 7 * 24 * 60 * 60 * 1000;
+
 const createPoll = asyncHandler( async (req, res) => {
 
 	if (process.env.NODE_ENV === "development") {
@@ -23,35 +25,49 @@ const createPoll = asyncHandler( async (req, res) => {
 
 	const formatedOpts = options.map(text => ({ text, vote: 0, optionID: randomUUID() }));
 
-	const poll = await Poll.create({ userID, options: formatedOpts, title });
+	const poll = await Poll.create({ userID, options: formatedOpts, title, expiresAt: Date.now() + POLL_EXPIRY_WINDOW });
+	
+	await poll.populate('userID', 'name');
+	const createdPoll = await poll.toObject();
+	const { userID: author, ...rest } = createdPoll;
+	const formattedPoll = { author, ...rest };
 
-	const response = { success: true, data: poll, message: "Poll created successfully" };
+	const response = { success: true, data: formattedPoll, message: "Poll created successfully" };
 	return res.status(201).json(response);
 } );
 
 const fetchPolls = asyncHandler( async (req, res) => {
 
 	const polls = await Poll.find().sort({ createdAt: -1 }).populate('userID', "name").lean();
-	const response = { success: true, data: polls, message: "Polls fetched successfully" };
+	const formattedPolls = polls.map(({ userID, ...rest }) => ({
+		...rest,
+		author: userID
+	}));
+
+	const response = { success: true, data: formattedPolls, message: "Polls fetched successfully" };
 	return res.status(200).json(response);
 } );
 
-const getPollByID = asyncHandler( async (req, res) => {
+// const getPollByID = asyncHandler( async (req, res) => {
 
-	if (process.env.NODE_ENV === "development") {
+// 	if (process.env.NODE_ENV === "development") {
 		
-		console.log("getPollByID controller");
-		console.log("req.params :", req.params);
-	}
+// 		console.log("getPollByID controller");
+// 		console.log("req.params :", req.params);
+// 	}
 	
-	const pollID = req.params.id;
+// 	const pollID = req.params.id;
 
-	const poll = await Poll.findById(pollID);
-	if (!poll) throw new ApiError(404, ERRORS.POLL_NOT_FOUND);
+// 	const poll = await Poll.findOne({
+// 		_id: pollID,
+//   		open: true,
+//   		expiresAt: { $gt: Date().now() }
+// 	});
+// 	if (!poll) throw new ApiError(404, ERRORS.POLL_NOT_FOUND);
 
-	const response = { success: true, data: poll, message: "Poll fetched successfully" };
-	return res.status(200).json(response);
-} );
+// 	const response = { success: true, data: poll, message: "Poll fetched successfully" };
+// 	return res.status(200).json(response);
+// } );
 
 const closePoll = asyncHandler( async (req, res) => {
 	if (process.env.NODE_ENV === "development") {
@@ -63,7 +79,11 @@ const closePoll = asyncHandler( async (req, res) => {
 	const userID = req.user._id;
 	const pollID = req.params.id;
 
-	const poll = await Poll.findById(pollID);
+	const poll = await Poll.findOne({
+		_id: pollID,
+  		open: true,
+  		expiresAt: { $gt: new Date() }
+	});
 	if (!poll) throw new ApiError(404, ERRORS.POLL_NOT_FOUND);
 
 	if (!poll.userID.equals(userID)) throw new ApiError(403, ERRORS.POLL_CLOSE_ACTION_FORBIDDEN);
@@ -71,9 +91,14 @@ const closePoll = asyncHandler( async (req, res) => {
 	if (!poll.open) throw new ApiError(400, ERRORS.POLL_CLOSED);
 	poll.open = false;
 	await poll.save();
-	
-	const response = { success: true, data: poll, message: "Poll closed successfully" };
+
+	await poll.populate('userID', 'name')
+	const closedPoll = poll.toObject();
+	const { userID: author, ...rest } = closedPoll;
+	const formattedPoll = { author, ...rest };
+
+	const response = { success: true, data: formattedPoll, message: "Poll closed successfully" };
 	return res.status(200).json(response);
 } );
 
-export { createPoll, fetchPolls, getPollByID, closePoll };
+export { createPoll, fetchPolls /*, getPollByID */, closePoll };
