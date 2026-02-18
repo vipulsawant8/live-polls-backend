@@ -73,7 +73,7 @@ userSchema.methods.verifyPassword = async function (password) {
 
 userSchema.methods.generateAccessToken = function () {
 
-	return jwt.sign({ id: this._id, email: this.email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRY });
+	return jwt.sign({ id: this._id, email: this.email , name: this.name }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRY });
 };
 
 userSchema.methods.generateRefreshToken = function () {

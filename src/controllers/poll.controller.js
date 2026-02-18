@@ -32,7 +32,7 @@ const createPoll = asyncHandler( async (req, res) => {
 	const { userID: author, ...rest } = createdPoll;
 	const formattedPoll = { author, ...rest };
 
-	const response = { success: true, data: formattedPoll, message: "Poll created successfully" };
+	const response = { success: true, data: formattedPoll, message: `You created Poll "${poll.title}" successfully` };
 	return res.status(201).json(response);
 } );
 
@@ -97,7 +97,7 @@ const closePoll = asyncHandler( async (req, res) => {
 	const { userID: author, ...rest } = closedPoll;
 	const formattedPoll = { author, ...rest };
 
-	const response = { success: true, data: formattedPoll, message: "Poll closed successfully" };
+	const response = { success: true, data: formattedPoll, message: `You closed Poll ${poll.title}" successfully` };
 	return res.status(200).json(response);
 } );
 

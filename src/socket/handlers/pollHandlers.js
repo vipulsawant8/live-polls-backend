@@ -87,13 +87,16 @@ const castVoteHandler = async(io, socket, { pollID, optionID, optionDocID }) => 
 
 const addPollHandler = async(io, socket, { poll }) => {
 
-	socket.broadcast.emit(POLL_EVENTS.ADD_POLL, { poll });
+	const name = socket.name;
+	socket.broadcast.emit(POLL_EVENTS.ADD_POLL, { poll, name });
 };
 
 const closePollHandler = async(io, socket, { poll }) => {
-	
+
+	const name = socket.name;
 	const room = `poll:${poll._id}`;
-	socket.to(room).emit(POLL_EVENTS.CLOSE_POLL, { poll });
+	socket.to(room).emit(POLL_EVENTS.CLOSE_POLL, { poll, name });
+	socket.broadcast.emit(POLL_EVENTS.UPDATE_POLL_DATA, { poll });
 };
 
 export { castVoteHandler, joinPollHandler, leavePollHandler, addPollHandler, closePollHandler };

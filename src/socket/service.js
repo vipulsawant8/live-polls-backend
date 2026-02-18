@@ -14,8 +14,7 @@ const socketHandler = (io) => {
 		const accessToken = cookies.accessToken;
 		
 		if (process.env.NODE_ENV !== "production") console.log("accessToken :", accessToken);
-
-		// const accessToken = socket.handshake.auth?.token;
+		
 		if (!accessToken) {
 			socket.userID = null;
 			return next();
@@ -26,6 +25,7 @@ const socketHandler = (io) => {
 			const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
 			if (process.env.NODE_ENV !== "production") console.log("decoded :", decoded);
 			socket.userID = decoded.id;
+			socket.name = decoded.name;
 		} catch (error) {
 			
 			socket.userID = null;

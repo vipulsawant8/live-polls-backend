@@ -1,9 +1,12 @@
 import { Router } from "express";
 
-import { getMe, loginUser, logoutUser, registerUser, refreshAccessToken } from "../controllers/auth.controller.js";
+import { getMe, sendOtp, verifyOtp, loginUser, logoutUser, registerUser, refreshAccessToken } from "../controllers/auth.controller.js";
 import verifyLogin from "../middlewares/auth/verifyLogin.js";
 
 const router = Router();
+
+router.post('/send-otp', sendOtp);
+router.post('/verify-otp', verifyOtp);
 
 router.post('/register', registerUser);
 router.post('/login', loginUser);
