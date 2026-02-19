@@ -10,11 +10,11 @@ const setCookieOptions = name => {
 	const config = {
 		accessToken: {
 			...base,
-			maxAge: 30 * 60 * 1000
+			maxAge: 15 * 60 * 1000
 		},
 		refreshToken: {
 			...base,
-			maxAge: 15 * 24 * 60 * 60 * 1000
+			maxAge: 14 * 24 * 60 * 60 * 1000
 		}
 	 };
 

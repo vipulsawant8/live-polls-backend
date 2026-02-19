@@ -25,6 +25,7 @@ const verifyLogin = asyncHandler( async (req, res, next) => {
 	if (!user) throw new ApiError(404, "User not found");
 
 	req.user = user;
+	req.user.deviceId = decodedToken.deviceId;
 	next();
 } );
 

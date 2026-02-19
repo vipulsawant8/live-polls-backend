@@ -1,6 +1,6 @@
 const ERRORS = {
 	// AUTHENTICATION
-	INVALID_CREDENTIALS: "Invalid email or password",
+	INVALID_CREDENTIALS: "Invalid credentials!",
 	UNAUTHORIZED: "Unauthorized access",
 	TOKEN_EXPIRED: "Token expired, please login again",
 	TOKEN_INVALID: "Invalid token",
@@ -15,7 +15,7 @@ const ERRORS = {
 	POLL_NOT_FOUND: "Poll Closed or Expired",
 	POLL_DATA_REQUIRED: "Poll title and atleast 2 options are required",
 	POLL_OPTIONS_LENGTH_MAX: "Options per poll should not be more than 6 ",
-	POLL_ALREADY_EXISTS: "You already have a Poll with this title",
+	POLL_ALREADY_EXISTS: "You already created a Poll with this title",
 	POLL_CLOSED: "Poll is closed for voting",
 	OPTION_NOT_FOUND: "Poll option not found",
 	POLL_CLOSE_ACTION_FORBIDDEN: "Only the poll creator can close the poll",

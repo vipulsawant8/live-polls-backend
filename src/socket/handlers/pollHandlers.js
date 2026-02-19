@@ -36,7 +36,7 @@ const castVoteHandler = async(io, socket, { pollID, optionID, optionDocID }) => 
 		const userID = socket.userID;
 	  	const room = `poll:${pollID}`;
 
-		console.log(`pollID: ${pollID}, optionID: ${optionID}, optionDocID: ${optionDocID}`);
+		if (process.env.NODE_ENV === "developmemt") console.log(`pollID: ${pollID}, optionID: ${optionID}, optionDocID: ${optionDocID}`);
 
 		if (!userID) {
 			return socket.emit(POLL_EVENTS.VOTE_REJECTED, { message: "Login required" });
