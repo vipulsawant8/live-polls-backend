@@ -14,7 +14,7 @@ export const sendEmail = async ({ to, subject, text }) => {
   try {
     await apiInstance.sendTransacEmail({
       sender: {
-        name: "Notes App",
+        name: "Live Polls",
         email: process.env.EMAIL_USER,
       },
       to: [{ email: to }],
