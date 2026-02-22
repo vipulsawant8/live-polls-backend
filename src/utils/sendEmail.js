@@ -1,5 +1,5 @@
 import * as Brevo from "@getbrevo/brevo";
-import ApiError from "../utils/ApiError.js"; // adjust path if needed
+import ApiError from "./ApiError.js"; // adjust path if needed
 
 // Create API instance
 const apiInstance = new Brevo.TransactionalEmailsApi();

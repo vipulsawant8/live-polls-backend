@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 const userSchema = new Schema({
+	
 	name: {
 		
 		type: String,
@@ -21,6 +22,10 @@ const userSchema = new Schema({
 		type: String,
 		required: true,
 		trim: true
+	},
+	isVerified: {
+		type: Boolean,
+		default: false
 	},
 	refreshTokens : 
 		[
@@ -46,10 +51,17 @@ const userSchema = new Schema({
 					type: Date
 				}
 			}
-		]
+		],
+	verificationToken: {
+		type: String
+	},
+	verificationTokenExpiry: {
+		type: Date
+	}
 }, { timestamps: true });
 
 userSchema.index({ email: 1 }, { unique:true });
+// userSchema.index({ verified: 1 });
 
 userSchema.pre('save', async function () {
 	if (this.isModified('password')) {

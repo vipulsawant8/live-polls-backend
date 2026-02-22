@@ -18,10 +18,18 @@ import { Schema, model, Types } from "mongoose";
 		
 		type: String,
 		require: true
+	},
+	expiresAt: {
+		type: Date,
+		required: true
 	}
 }, { timestamps: true });
 
 voteSchema.index({ userID: 1, pollID: 1 }, { unique: true });
+voteSchema.index(
+	{ expiresAt: 1 },
+	{ expireAfterSeconds: 0 }
+);
 
 const Vote = model("Vote", voteSchema);
 

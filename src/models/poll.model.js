@@ -45,6 +45,11 @@ const pollSchema = new Schema({
 
 pollSchema.index({ userID: 1, title: 1 }, { unique: true, collation: { locale: 'en', strength: 2 } });
 
+pollSchema.index(
+  { expiresAt: 1 },
+  { expireAfterSeconds: 0 }
+);
+
 pollSchema.methods.toJSON = function () {
 
 	const poll = this.toObject();
