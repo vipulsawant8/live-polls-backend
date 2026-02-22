@@ -14,6 +14,7 @@ const ERRORS = {
 	// POLL
 	POLL_NOT_FOUND: "Poll Closed or Expired",
 	POLL_DATA_REQUIRED: "Poll title and atleast 2 options are required",
+	POLL_OPTIONS_LENGTH_MIN: "Options per poll should atleast be 2 ",
 	POLL_OPTIONS_LENGTH_MAX: "Options per poll should not be more than 6 ",
 	POLL_ALREADY_EXISTS: "You already created a Poll with this title",
 	POLL_CLOSED: "Poll is closed for voting",
