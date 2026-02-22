@@ -63,7 +63,7 @@ const castVoteHandler = async(io, socket, { pollID, optionID, optionDocID }) => 
 		}
 
 		// Create vote (DB-level duplicate protection)
-		await Vote.create({ pollID, userID, optionID });
+		await Vote.create({ pollID, userID, optionID, expiresAt: updateResult.expiresAt });
 
 		const { userID:author, ...rest } = updateResult;
 		const formattedPoll = { author, ...rest };
