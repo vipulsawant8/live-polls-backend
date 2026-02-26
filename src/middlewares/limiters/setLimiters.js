@@ -13,6 +13,7 @@ const createLimiter = (windowMs, max, message, keyType = "ip") =>
 			// console.log("Rate limit key:", key);
 			// Safe IPv6-compatible IP handling
 			console.log("Instance PID:", process.pid);
+			console.log("Generated key:", ipKeyGenerator(req));
 			return key;
 		},
 		handler: (req, res, next) =>
