@@ -9,11 +9,11 @@ const createLimiter = (windowMs, max, message, keyType = "ip") =>
 			if (keyType === "email" && req.body?.email) {
 				return req.body.email;
 			}
-			const key = process.env.NODE_ENV === "development" ? req.ip: ipKeyGenerator(req);
+			const key = ipKeyGenerator(req.ip);
 			// console.log("Rate limit key:", key);
 			// Safe IPv6-compatible IP handling
 			console.log("Instance PID:", process.pid);
-			console.log("Generated key:", ipKeyGenerator(req));
+			console.log("Generated key:", ipKeyGenerator(req.ip));
 			return key;
 		},
 		handler: (req, res, next) =>
