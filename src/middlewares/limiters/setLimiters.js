@@ -12,6 +12,7 @@ const createLimiter = (windowMs, max, message, keyType = "ip") =>
 			const key = process.env.NODE_ENV === "development" ? req.ip: ipKeyGenerator(req);
 			// console.log("Rate limit key:", key);
 			// Safe IPv6-compatible IP handling
+			console.log("Instance PID:", process.pid);
 			return key;
 		},
 		handler: (req, res, next) =>
