@@ -9,12 +9,15 @@ const createLimiter = (windowMs, max, message, keyType = "ip") =>
 			if (keyType === "email" && req.body?.email) {
 				return req.body.email;
 			}
-
+			const key = process.env.NODE_ENV === "development" ? req.ip: ipKeyGenerator(req);
+			// console.log("Rate limit key:", key);
 			// Safe IPv6-compatible IP handling
-			return ipKeyGenerator(req);
+			return key;
 		},
 		handler: (req, res, next) =>
-			next(new ApiError(429, message))
+			next(new ApiError(429, message)),
+		standardHeaders: true,
+		legacyHeaders: false,
 	});
 
 export const createdUserLimiter = createLimiter(
@@ -37,10 +40,16 @@ export const loginLimiter = createLimiter(
 );
 
 export const forgotPasswordLimiter = createLimiter(
-	15 * 60 * 1000,
+	60 * 60 * 1000,
 	5,
 	"Too many reset requests. Please try again later.",
     "email"
+);
+
+export const resetPasswordLimiter = createLimiter(
+	60 * 60 * 1000,
+	10,
+	"Too many reset requests. Please try again later."
 );
 
 export const changePasswordLimiter = createLimiter(

@@ -8,10 +8,12 @@ import crypto from "crypto";
 
 import jwt from 'jsonwebtoken';
 import { sendEmail } from "../utils/sendEmail.js";
+import { success } from "zod";
 
 const REFRESH_TOKEN_EXPIRY = 14 * 24 * 60 * 60 * 1000;
 
 const VERIFICATION_TOKEN_EXPIRY = 15 * 60 * 1000;
+const PASSWORD_RESET_TOKEN_EXPIRY = 10 * 60 * 1000;
 
 const generateAccessRefreshToken = async ({ userId, deviceId, userAgent, ipAddress }) => {
 	const user = await User.findById(userId);
@@ -294,4 +296,108 @@ const refreshAccessToken = asyncHandler( async (req, res) => {
 		});
 } );
 
-export { createAccount, verifyEmail, loginUser, logoutUser, getMe, refreshAccessToken }; 
+const changePassword = asyncHandler( async (req, res) => {
+	
+	if (process.env.NODE_ENV === "development") {
+		
+		console.log("changePassword controller");
+		console.log("req.body:", req.body);
+	}
+	const user = req.user;
+
+	const { currentPassword, newPassword } = req.body;
+
+	const checkcurrentPassword = await user.verifyPassword(currentPassword);
+	if (!checkcurrentPassword) throw new ApiError(400, "Current Password is incorrect");
+
+	const checkNewPassword = await user.verifyPassword(newPassword);
+	if (checkNewPassword) throw new ApiError(400, "New Password cannot be same as Current Password");
+
+	user.password = newPassword;
+	await user.save();
+	
+	await User.updateOne(
+		{ _id: user._id },
+		{ $pull: { refreshTokens: { deviceId: { $ne: user.deviceId } } } }
+	);
+	
+	const { accessToken, refreshToken } = await generateAccessRefreshToken({ userId: user._id, deviceId: user.deviceId, userAgent: req.get('User-Agent') || '', ipAddress: req.ip || req.socket?.remoteAddress || '' });
+
+	const response = { message: "Password was Changed Successfully", success: true };
+	return res.status(200)
+	.cookie('accessToken', accessToken, setCookieOptions('accessToken'))
+	.cookie('refreshToken', refreshToken, setCookieOptions('refreshToken'))
+	.json(response);
+} );
+
+const forgotPassword = asyncHandler( async (req, res) => {
+	
+	if (process.env.NODE_ENV === "development") {
+		
+		console.log("forgetPassword controller");
+		console.log("req.body:", req.body);
+	}
+
+	const { email } = req.body;
+	
+	const user = await User.findOne({ email });
+	if (user) {
+		console.log('user :', user);
+		const rawToken = crypto.randomBytes(32).toString("hex");
+		const hashedToken = crypto
+			.createHash("sha256")
+			.update(rawToken)
+			.digest("hex");
+		const tokenExpiry = new Date(Date.now() + VERIFICATION_TOKEN_EXPIRY);
+		
+		user.passwordResetToken = hashedToken;
+		user.passwordResetExpiry = tokenExpiry;
+		await user.save();
+
+		const verificationLink =
+		`${process.env.CLIENT_URL}/reset-password?token=${rawToken}`;
+
+		await sendEmail({
+			to: email,
+			subject: "Forget Password Attemp",
+			text: `Click the link to reset your password: ${verificationLink}`
+		});
+	}
+	const response = { success:true, message: "If an account with that email exists, a reset link has been sent." };
+	return res.json(response);
+} );
+
+const resetPassword = asyncHandler( async (req, res) => {
+	
+	if (process.env.NODE_ENV === "development") {
+		
+		console.log("resetPassword controller");
+		console.log("req.body:", req.body);
+	}
+
+	const token = req.body.token || req.query.token;
+	const newPassword = req.body.newPassword;
+	
+	const hashedToken = crypto
+		.createHash("sha256")
+		.update(token)
+		.digest("hex");
+
+	const user = await User.findOne({
+		passwordResetToken: hashedToken,
+		passwordResetExpiry: { $gt: Date.now() }
+	});
+	if (!user) throw new ApiError(400, "Invalid or expired token.");
+
+	user.password = newPassword;
+	user.refreshTokens = [];
+	user.passwordResetToken = undefined;
+	user.passwordResetExpiry = undefined;
+	await user.save();
+
+	const response = { message: "Password was Reset", success: true };
+	return res.status(200)
+	.json(response);
+} );
+
+export { createAccount, verifyEmail, loginUser, logoutUser, getMe, refreshAccessToken, changePassword, forgotPassword, resetPassword };

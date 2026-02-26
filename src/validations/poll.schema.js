@@ -1,4 +1,5 @@
 import z from "zod";
+import { Types } from "mongoose";
 
 export const addPollSchema = z.object({
     title: z.string().trim().min(1, "Title is required"),
