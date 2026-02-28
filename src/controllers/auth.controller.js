@@ -8,12 +8,9 @@ import crypto from "crypto";
 
 import jwt from 'jsonwebtoken';
 import { sendEmail } from "../utils/sendEmail.js";
-import { success } from "zod";
 
 const REFRESH_TOKEN_EXPIRY = 14 * 24 * 60 * 60 * 1000;
-
 const VERIFICATION_TOKEN_EXPIRY = 15 * 60 * 1000;
-const PASSWORD_RESET_TOKEN_EXPIRY = 10 * 60 * 1000;
 
 const generateAccessRefreshToken = async ({ userId, deviceId, userAgent, ipAddress }) => {
 	const user = await User.findById(userId);
